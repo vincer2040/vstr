@@ -72,7 +72,7 @@ duplicate a vstr (creates a seperate memory allocation):
 ```c
 vstr s1 = vstr_from("vstr");
 vstr s2 = vstr_dup(s1);
-assert(strcmp(s1, s2));
+assert(strcmp(s1, s2) == 0);
 ```
 
 specify an initial capacity
