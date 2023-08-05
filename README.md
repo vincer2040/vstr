@@ -39,12 +39,18 @@ s = vstr_push_char(s, 't');
 s = vstr_push_char(s, 'r');
 s = vstr_push_str(s, " is a string implementation");
 printf("%s\n", s); // "vstr is a string implementation"
-vstr_free(s);
+vstr_delete(s);
 ```
 
 Notice that you have to reset `s` when appending chars or char*s. This is because vstr
 may have to reallocate the internal data structure to accomodate the new
 length.
+
+destroy the vstr:
+
+```c
+vstr_delete(vstr);
+```
 
 create a vstr from a C string:
 
@@ -69,12 +75,22 @@ vstr s2 = vstr_dup(s1);
 assert(strcmp(s1, s2));
 ```
 
-get the length of a vstr:
+specify an initial capacity
+(one will be added to ensure null terminator is accounted for):
+
+```c
+vstr s1 = vstr_new_len(32);
+assert(vstr_cap(s1) == 33);
+assert(vstr_available(s1) == 32);
+```
+
+useful utility functions:
 
 ```c
 vstr s = vstr_from("vstr");
-size_t len = vstr_len(s);
-printf("%lu\n", len); // "4"
+size_t len = vstr_len(s); // the length of the vstr
+size_t len = vstr_cap(s); // the capacity of the vstr
+size_t len = vstr_available(s); // the available space in the vstr
 ```
 
 ### specify an allocator:
