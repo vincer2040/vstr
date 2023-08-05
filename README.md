@@ -1,6 +1,8 @@
 # vstr
 
-a safe string implementation in pure C
+A safe string implementation in pure C. Originally created for
+an interpreter following the incredible book "Writing an Interpreter In Go"
+by Thorston Bell (you can find the book [here](https://interpreterbook.com/), highly recommend)
 
 ## Getting started
 
@@ -17,6 +19,8 @@ below is the internal representation of the vstr:
 ```
 
 The header contains two field: the length of the string, and the capacity of the string.
+All of the data for a vstr is contained in the same memory allocation, so it is good
+for cache locality.
 
 ### using vstr
 
