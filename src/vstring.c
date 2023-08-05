@@ -17,7 +17,7 @@ int vstring_set(vstring** vstr, char* cstr);
 
 #define realloc_vstr(vstr, ins, cap)                                           \
     {                                                                          \
-        *vstr = vstr_realloc(*vstr, sizeof(vstring) + cap);                         \
+        *vstr = vstr_realloc(*vstr, sizeof(vstring) + cap);                    \
         if (*vstr == NULL) {                                                   \
             return -1;                                                         \
         }                                                                      \
