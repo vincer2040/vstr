@@ -9,7 +9,7 @@ by Thorston Bell (you can find the book [here](https://interpreterbook.com/), hi
 The easiest way to get started is to copy the two files vstring.c and vstring.h into
 your project and compile them with your binary.
 
-You can also install the library. See [Installing](https://github.com/boreddad/vstr/#Installing)
+You can also install the library. See [Installing](#installing)
 
 ### how it works
 
