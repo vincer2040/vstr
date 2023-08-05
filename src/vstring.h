@@ -8,6 +8,10 @@
 typedef struct {
     size_t len;
     size_t cap;
+} vstring_hdr;
+
+typedef struct {
+    vstring_hdr hdr;
     char data[];
 } vstring;
 

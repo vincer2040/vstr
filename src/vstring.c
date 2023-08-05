@@ -13,7 +13,7 @@
             return -1;                                                         \
         }                                                                      \
         memset((*vstr)->data + ins, 0, cap - ins);                             \
-        (*vstr)->cap = cap;                                                    \
+        (*vstr)->hdr.cap = cap;                                                    \
     }
 
 /**
@@ -30,8 +30,8 @@ vstring* vstring_new() {
     }
 
     memset(vstr, 0, needed_len);
-    vstr->len = 0;
-    vstr->cap = VSTRING_INITIAL_CAP;
+    vstr->hdr.len = 0;
+    vstr->hdr.cap = VSTRING_INITIAL_CAP;
 
     return vstr;
 }
@@ -51,8 +51,8 @@ vstring* vstring_from(char* cstr) {
     }
     memset(vstr, 0, needed_len);
     memcpy(vstr->data, cstr, cap);
-    vstr->len = cap;
-    vstr->cap = cap + 1;
+    vstr->hdr.len = cap;
+    vstr->hdr.cap = cap + 1;
     return vstr;
 }
 
@@ -66,14 +66,14 @@ int vstring_push_char(vstring** vstr, char c) {
     size_t ins, cap;
     vstring vs;
     vs = **vstr;
-    cap = vs.cap;
-    ins = vs.len;
+    cap = vs.hdr.cap;
+    ins = vs.hdr.len;
     if (ins == (cap - 1)) {
         cap <<= 1; // multiply by two
         realloc_vstr(vstr, ins, cap);
     }
     (*vstr)->data[ins] = c;
-    (*vstr)->len++;
+    (*vstr)->hdr.len++;
     return 0;
 }
 
@@ -87,8 +87,8 @@ int vstring_push_string(vstring** vstr, char* cstr) {
     size_t ins, cap, cstr_len, needed;
     vstring vs;
     vs = **vstr;
-    ins = vs.len;
-    cap = vs.cap;
+    ins = vs.hdr.len;
+    cap = vs.hdr.cap;
     cstr_len = strlen(cstr);
     needed = ins + cstr_len;
     if (needed > (cap - 1)) {
@@ -97,7 +97,7 @@ int vstring_push_string(vstring** vstr, char* cstr) {
         realloc_vstr(vstr, ins, cap);
     }
     memcpy((*vstr)->data + ins, cstr, cstr_len);
-    (*vstr)->len += cstr_len;
+    (*vstr)->hdr.len += cstr_len;
     return 0;
 }
 
@@ -106,7 +106,7 @@ int vstring_push_string(vstring** vstr, char* cstr) {
  * @param vstr the allocated vstring
  * @return the length of the string
  */
-size_t vstring_len(vstring* vstr) { return vstr->len; }
+size_t vstring_len(vstring* vstr) { return vstr->hdr.len; }
 
 /**
  * @brief get the c string
