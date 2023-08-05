@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 START_TEST(test_vstr_works) {
     vstr str = vstr_new();
     str = vstr_push_char(str, 'v');
@@ -13,16 +14,23 @@ START_TEST(test_vstr_works) {
     str = vstr_push_char(str, 'c');
     str = vstr_push_char(str, 'e');
     ck_assert_str_eq(str, "vince");
-    vstr_free(str);
+    vstr_delete(str);
 }
 END_TEST
 
 START_TEST(test_vstr_push_str) {
     vstr str = vstr_from("vince");
     str = vstr_push_string(str, " is cool");
-    printf("%s\n", str);
     ck_assert_str_eq(str, "vince is cool");
-    vstr_free(str);
+    vstr_delete(str);
+}
+END_TEST
+
+START_TEST(test_vstr_set) {
+    vstr str = vstr_from("vince");
+    str = vstr_set(str, "vince is cool");
+    ck_assert_str_eq(str, "vince is cool");
+    vstr_delete(str);
 }
 END_TEST
 
@@ -33,6 +41,7 @@ Suite* ht_suite() {
     tc_core = tcase_create("Core");
     tcase_add_test(tc_core, test_vstr_works);
     tcase_add_test(tc_core, test_vstr_push_str);
+    tcase_add_test(tc_core, test_vstr_set);
     suite_add_tcase(s, tc_core);
     return s;
 }

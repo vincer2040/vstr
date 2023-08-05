@@ -1,20 +1,23 @@
 #include "vstring.h"
 #include "stdio.h"
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 
 vstring* vstring_new();
 vstring* vstring_from(char* cstr);
 int vstring_push_char(vstring** vstr, char c);
 int vstring_push_string(vstring** vstr, char* cstr);
+int vstring_set(vstring** vstr, char* cstr);
 
+// can this be optimized depending on the allocator ?
+// the only problem is that i think this would cause ifdef hell.. to deal
+// with but 32 bit architectures and checking what the allocator is.
 #define VSTRING_INITIAL_CAP 32
 #define VSTRING_OFFSET sizeof(vstring_hdr)
 
 #define realloc_vstr(vstr, ins, cap)                                           \
     {                                                                          \
-        *vstr = realloc(*vstr, sizeof(vstring) + cap);                         \
+        *vstr = vstr_realloc(*vstr, sizeof(vstring) + cap);                         \
         if (*vstr == NULL) {                                                   \
             return -1;                                                         \
         }                                                                      \
@@ -54,6 +57,22 @@ vstr vstr_from(char* cstr) {
 }
 
 /**
+ * @brief set contents of a vstring
+ * @param str pointer to vstring
+ * @param cstr the string to set vstr to - must not be NULL
+ * @return pointer to vstr, NULL if realloc called and failed
+ */
+vstr vstr_set(vstr str, char* cstr) {
+    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
+    int set_res = vstring_set(&vstr, cstr);
+    if (set_res == -1) {
+        return NULL;
+    }
+
+    return vstr->data;
+}
+
+/**
  * @brief append a char to the end of str
  * @param str the allocated vstr
  * @param c the char to push
@@ -71,7 +90,7 @@ vstr vstr_push_char(vstr str, char c) {
 /**
  * @brief append a string to the end of str
  * @param str the allocated vstr
- * @param cstr pointer to c string
+ * @param cstr pointer to c string - must not be NULL
  * @return pointer to string, NULL if realloc called and failed
  */
 vstr vstr_push_string(vstr str, char* cstr) {
@@ -83,16 +102,43 @@ vstr vstr_push_string(vstr str, char* cstr) {
     return vstr->data;
 }
 
+/**
+ * @brief get length of the vstr
+ * @param str pointer to vstr
+ * @return length of the string
+ */
 size_t vstr_len(vstr str) {
     vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
     return vstr->hdr.len;
 }
 
 /**
+ * @brief get capacity of the vstr
+ * @param str pointer to vstr
+ * @return capacity of the vstr
+ */
+size_t vstr_cap(vstr str) {
+    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
+    return vstr->hdr.cap - 1; // -1 to account for null terminator
+}
+
+/**
+ * @brief get available space in the vstr
+ * @param str pointer to vstr
+ * @return available space in vstr
+ */
+size_t vstr_available(vstr str) {
+    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
+    // cap is always >= len + 1
+    // we accomodate for null terminator with - 1
+    return vstr->hdr.cap - vstr->hdr.len - 1;
+}
+
+/**
  * @brief free vstring
  * @param pointer to vstr to free
  */
-void vstr_free(vstr str) {
+void vstr_delete(vstr str) {
     void* ptr = str - VSTRING_OFFSET;
     free(ptr);
 }
@@ -105,7 +151,7 @@ vstring* vstring_new() {
     vstring* vstr;
     size_t needed_len = sizeof(vstring) + VSTRING_INITIAL_CAP;
 
-    vstr = malloc(needed_len);
+    vstr = vstr_malloc(needed_len);
     if (vstr == NULL) {
         return NULL;
     }
@@ -126,7 +172,7 @@ vstring* vstring_from(char* cstr) {
     vstring* vstr;
     size_t cap = strlen(cstr);
     size_t needed_len = sizeof(vstring) + cap + 1;
-    vstr = malloc(needed_len);
+    vstr = vstr_malloc(needed_len);
     if (vstr == NULL) {
         return NULL;
     }
@@ -182,6 +228,25 @@ int vstring_push_string(vstring** vstr, char* cstr) {
     return 0;
 }
 
+int vstring_set(vstring** vstr, char* cstr) {
+    size_t ins, cap, cstr_len, needed;
+    vstring vs;
+    vs = **vstr;
+    ins = vs.hdr.len;
+    cap = vs.hdr.cap;
+    cstr_len = strlen(cstr);
+    needed = ins + cstr_len;
+    if (needed > (cap - 1)) {
+        cap <<= 1;
+        cap += needed;
+        realloc_vstr(vstr, ins, cap);
+    }
+    memset((*vstr)->data, 0, cap);
+    memcpy((*vstr)->data, cstr, cstr_len);
+    (*vstr)->hdr.len = cstr_len;
+    return 0;
+}
+
 /**
  * @brief get the length of the string
  * @param vstr the allocated vstring
@@ -200,4 +265,4 @@ char* vstring_get(vstring* vstr) { return vstr->data; }
  * @brief free the vstring
  * @param vstr the vstring to free
  */
-void vstring_free(vstring* vstr) { free(vstr); }
+void vstring_free(vstring* vstr) { vstr_free(vstr); }
