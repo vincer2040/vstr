@@ -12,4 +12,5 @@ add_compile_options(-std=c99 -Wall -Werror -pedantic -fstack-clash-protection -f
     -Werror=format-security -Werror=implicit-function-declaration -pipe -g -O2)
 
 add_library(vstring src/vstring.c)
+add_library(vec src/vec.c)
 
