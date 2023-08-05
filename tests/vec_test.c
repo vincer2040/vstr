@@ -16,12 +16,14 @@ START_TEST(test_vec_works) {
         int t_at = test_ints[i];
         vec_push(&vec, &t_at);
     }
+
     while (i--) {
         int t_at = test_ints[i];
         int popped = 0;
         vec_pop(vec, &popped);
         ck_assert_int_eq(popped, t_at);
     }
+
     vec_free(vec, NULL);
 }
 END_TEST
@@ -47,13 +49,39 @@ START_TEST(test_vec_strings) {
 }
 END_TEST
 
+START_TEST(test_vec_iter) {
+    int test_ints[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    size_t i, test_len;
+    vec* vec;
+    void* cur;
+    vec_iter iter;
+    test_len = sizeof(test_ints) / sizeof(test_ints[0]);
+    vec = vec_new(sizeof(int));
+
+    for (i = 0; i < test_len; ++i) {
+        int t_at = test_ints[i];
+        vec_push(&vec, &t_at);
+    }
+
+    iter = vec_iter_new(vec);
+    for (cur = iter.cur, i = 0; cur != NULL; vec_iter_next(&iter), cur = iter.cur, ++i) {
+        int t_at = test_ints[i];
+        int a = *((int*)cur);
+        ck_assert_int_eq(t_at, a);
+    }
+
+    vec_free(vec, NULL);
+}
+END_TEST
+
 Suite* ht_suite() {
     Suite* s;
     TCase* tc_core;
-    s = suite_create("lexer_test");
+    s = suite_create("vec_test");
     tc_core = tcase_create("Core");
     tcase_add_test(tc_core, test_vec_works);
     tcase_add_test(tc_core, test_vec_strings);
+    tcase_add_test(tc_core, test_vec_iter);
     suite_add_tcase(s, tc_core);
     return s;
 }
