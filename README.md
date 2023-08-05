@@ -37,7 +37,7 @@ s = vstr_push_char(s, 'v');
 s = vstr_push_char(s, 's');
 s = vstr_push_char(s, 't');
 s = vstr_push_char(s, 'r');
-s = vstr_push_str(s, " is a string implementation");
+s = vstr_push_string(s, " is a string implementation");
 printf("%s\n", s); // "vstr is a string implementation"
 vstr_delete(s);
 ```
