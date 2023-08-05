@@ -34,6 +34,14 @@ START_TEST(test_vstr_set) {
 }
 END_TEST
 
+START_TEST(test_vstr_dup) {
+    vstr str1 = vstr_from("vince");
+    vstr str2 = vstr_dup(str1);
+    ck_assert_str_eq(str1, str2);
+    vstr_delete(str1);
+    vstr_delete(str2);
+}
+
 Suite* ht_suite() {
     Suite* s;
     TCase* tc_core;
