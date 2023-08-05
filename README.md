@@ -96,8 +96,8 @@ useful utility functions:
 ```c
 vstr s = vstr_from("vstr");
 size_t len = vstr_len(s); // the length of the vstr
-size_t len = vstr_cap(s); // the capacity of the vstr
-size_t len = vstr_available(s); // the available space in the vstr
+size_t cap = vstr_cap(s); // the capacity of the vstr
+size_t avail = vstr_available(s); // the available space in the vstr
 ```
 
 ### specify an allocator:
