@@ -42,6 +42,13 @@ START_TEST(test_vstr_dup) {
     vstr_delete(str2);
 }
 
+START_TEST(test_vstr_format) {
+    vstr s = vstr_format("%s %c %d %u", "vince", 'v', 420, 69);
+    ck_assert_str_eq(s, "vince v 420 69");
+    vstr_delete(s);
+}
+END_TEST
+
 Suite* ht_suite() {
     Suite* s;
     TCase* tc_core;
@@ -50,6 +57,7 @@ Suite* ht_suite() {
     tcase_add_test(tc_core, test_vstr_works);
     tcase_add_test(tc_core, test_vstr_push_str);
     tcase_add_test(tc_core, test_vstr_set);
+    tcase_add_test(tc_core, test_vstr_format);
     suite_add_tcase(s, tc_core);
     return s;
 }
