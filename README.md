@@ -51,7 +51,6 @@ create a vstr from a C string:
 ```c
 vstr s = vstr_from("vstr");
 printf("%s\n", s); // "vstr"
-vstr_delete(s);
 ```
 
 set the vstring to a different C string
@@ -60,7 +59,14 @@ set the vstring to a different C string
 vstr s = vstr_from("vstr");
 s = vstr_set(s, "a string implementation");
 printf("%s\n", s); // "a string implementation"
-vstr_delete(s);
+```
+
+duplicate a vstr (creates a seperate memory allocation):
+
+```c
+vstr s1 = vstr_from("vstr");
+vstr s2 = vstr_dup(s1);
+assert(strcmp(s1, s2));
 ```
 
 get the length of a vstr:
@@ -69,7 +75,6 @@ get the length of a vstr:
 vstr s = vstr_from("vstr");
 size_t len = vstr_len(s);
 printf("%lu\n", len); // "4"
-vstr_delete(s);
 ```
 
 ### specify an allocator:
