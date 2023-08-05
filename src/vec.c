@@ -1,6 +1,7 @@
 #include "vec.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define VEC_INITIAL_CAP 32
 
@@ -97,4 +98,25 @@ void vec_free(vec* v, VecFreeCallBack* fcb) {
         }
     }
     free(v);
+}
+
+vec_iter vec_iter_new(vec* vec) {
+    vec_iter vi = { 0 };
+    vi.vec = vec;
+    vi.end_idx = vec->len;
+    vi.at_idx = 0;
+    vec_iter_next(&vi);
+    vec_iter_next(&vi);
+    return vi;
+}
+
+void vec_iter_next(vec_iter* iter) {
+    if (iter->at_idx >= iter->end_idx) {
+        iter->cur = iter->next;
+        iter->next = NULL;
+        return;
+    }
+    iter->cur = iter->next;
+    iter->next = iter->vec->data + (iter->at_idx * iter->vec->data_size);
+    iter->at_idx++;
 }
