@@ -42,7 +42,7 @@ END_TEST
 Suite* ht_suite() {
     Suite* s;
     TCase* tc_core;
-    s = suite_create("lexer_test");
+    s = suite_create("string_test");
     tc_core = tcase_create("Core");
     tcase_add_test(tc_core, test_vstring_works);
     tcase_add_test(tc_core, test_vstring_push_char);
