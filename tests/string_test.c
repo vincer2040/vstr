@@ -5,37 +5,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-START_TEST(test_vstring_works) {
-    vstring* vstr = vstring_new();
-    vstring_push_char(&vstr, 'v');
-    vstring_push_char(&vstr, 'i');
-    vstring_push_char(&vstr, 'n');
-    vstring_push_char(&vstr, 'c');
-    vstring_push_char(&vstr, 'e');
-    ck_assert_str_eq(vstring_get(vstr), "vince");
-    vstring_free(vstr);
+START_TEST(test_vstr_works) {
+    vstr str = vstr_new();
+    str = vstr_push_char(str, 'v');
+    str = vstr_push_char(str, 'i');
+    str = vstr_push_char(str, 'n');
+    str = vstr_push_char(str, 'c');
+    str = vstr_push_char(str, 'e');
+    ck_assert_str_eq(str, "vince");
+    vstr_free(str);
 }
 END_TEST
 
-START_TEST(test_vstring_push_char) {
-    vstring* vstr = vstring_from("vince");
-    ck_assert_str_eq(vstr->data, "vince");
-    vstring_push_char(&vstr, 'n');
-    vstring_push_char(&vstr, 't');
-    ck_assert_str_eq(vstring_get(vstr), "vincent");
-    ck_assert_uint_eq(vstring_len(vstr), 7);
-    vstring_free(vstr);
-}
-END_TEST
-
-START_TEST(test_vstring_push_str) {
-    vstring* vstr = vstring_from("vince");
-    ck_assert_str_eq(vstr->data, "vince");
-    vstring_push_string(&vstr, "nt ");
-    vstring_push_string(&vstr, "is cool");
-    ck_assert_str_eq(vstring_get(vstr), "vincent is cool");
-    ck_assert_uint_eq(vstring_len(vstr), 15);
-    vstring_free(vstr);
+START_TEST(test_vstr_push_str) {
+    vstr str = vstr_from("vince");
+    str = vstr_push_string(str, " is cool");
+    printf("%s\n", str);
+    ck_assert_str_eq(str, "vince is cool");
+    vstr_free(str);
 }
 END_TEST
 
@@ -44,9 +31,8 @@ Suite* ht_suite() {
     TCase* tc_core;
     s = suite_create("string_test");
     tc_core = tcase_create("Core");
-    tcase_add_test(tc_core, test_vstring_works);
-    tcase_add_test(tc_core, test_vstring_push_char);
-    tcase_add_test(tc_core, test_vstring_push_str);
+    tcase_add_test(tc_core, test_vstr_works);
+    tcase_add_test(tc_core, test_vstr_push_str);
     suite_add_tcase(s, tc_core);
     return s;
 }

@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+typedef char* vstr;
+
 typedef struct {
     size_t len;
     size_t cap;
@@ -15,12 +17,11 @@ typedef struct {
     char data[];
 } vstring;
 
-vstring* vstring_new();
-vstring* vstring_from(char* cstr);
-int vstring_push_char(vstring** vstr, char c);
-int vstring_push_string(vstring** vstr, char* cstr);
-size_t vstring_len(vstring* vstr);
-char* vstring_get(vstring* vstr);
-void vstring_free(vstring* vstr);
+vstr vstr_new();
+vstr vstr_from(char* cstr);
+vstr vstr_push_char(vstr str, char c);
+vstr vstr_push_string(vstr str, char* cstr);
+size_t vstr_len(vstr str);
+void vstr_free(vstr str);
 
 #endif /* __VSTRING_H__ */

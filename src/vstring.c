@@ -4,7 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+vstring* vstring_new();
+vstring* vstring_from(char* cstr);
+int vstring_push_char(vstring** vstr, char c);
+int vstring_push_string(vstring** vstr, char* cstr);
+
 #define VSTRING_INITIAL_CAP 32
+#define VSTRING_OFFSET sizeof(vstring_hdr)
 
 #define realloc_vstr(vstr, ins, cap)                                           \
     {                                                                          \
@@ -13,8 +19,83 @@
             return -1;                                                         \
         }                                                                      \
         memset((*vstr)->data + ins, 0, cap - ins);                             \
-        (*vstr)->hdr.cap = cap;                                                    \
+        (*vstr)->hdr.cap = cap;                                                \
     }
+
+/**
+ * @brief allocate a new vstr
+ * @return pointer to string, NULL if malloc failed
+ */
+vstr vstr_new() {
+    vstring* vstr;
+
+    vstr = vstring_new();
+    if (vstr == NULL) {
+        return NULL;
+    }
+
+    return vstr->data;
+}
+
+/**
+ * @breif allocate a new vstr from a cstr
+ * @param cstr the string to copy - must not be NULL
+ * @return pointer to string, NULL if malloc failed
+ */
+vstr vstr_from(char* cstr) {
+    vstring* vstr;
+
+    vstr = vstring_from(cstr);
+    if (vstr == NULL) {
+        return NULL;
+    }
+
+    return vstr->data;
+}
+
+/**
+ * @brief append a char to the end of str
+ * @param str the allocated vstr
+ * @param c the char to push
+ * @return pointer to string, NULL if realloc called and failed
+ */
+vstr vstr_push_char(vstr str, char c) {
+    vstring* ptr = ((vstring*)(str - VSTRING_OFFSET));
+    int push_res = vstring_push_char(&ptr, c);
+    if (push_res == -1) {
+        return NULL;
+    }
+    return ptr->data;
+}
+
+/**
+ * @brief append a string to the end of str
+ * @param str the allocated vstr
+ * @param cstr pointer to c string
+ * @return pointer to string, NULL if realloc called and failed
+ */
+vstr vstr_push_string(vstr str, char* cstr) {
+    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
+    int push_res = vstring_push_string(&vstr, cstr);
+    if (push_res == -1) {
+        return NULL;
+    }
+    return vstr->data;
+}
+
+size_t vstr_len(vstr str) {
+    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
+    return vstr->hdr.len;
+}
+
+/**
+ * @brief free vstring
+ * @param pointer to vstr to free
+ */
+void vstr_free(vstr str) {
+    void* ptr = str - VSTRING_OFFSET;
+    free(ptr);
+}
 
 /**
  * @brief allocate a vstring
