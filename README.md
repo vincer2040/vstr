@@ -9,7 +9,7 @@ by Thorston Bell (you can find the book [here](https://interpreterbook.com/), hi
 The easiest way to get started is to copy the two files vstring.c and vstring.h into
 your project and compile them with your binary.
 
-You can also install the library. See [Installing] (#Installing)
+You can also install the library. See [Installing](https://github.com/boreddad/vstr/#Installing)
 
 ### how it works
 
@@ -85,16 +85,16 @@ vstr_delete(s);
 ensure that the allocating and deallocating implementations are defined before
 including the vstr header file
 
-## Installing
+# Installing
 
-### Requirements
+## Requirements
 
 1. gcc
 2. cmake
 
 if you want to test the library, [libcheck](https://github.com/libcheck/check) is required.
 
-### installing vstr
+## installing vstr
 
 1. clone this repo
 
@@ -128,7 +128,7 @@ sudo make install
 
 the default install path is /usr/local/lib
 
-## Limitations
+# Limitations
 
 Notice above how the user must reassign the vstr when appending to it. This is required because
 vstr might have to reallocate memory for its internal data structure to accomodate the new
