@@ -5,6 +5,7 @@
 
 vstring* vstring_new();
 vstring* vstring_from(char* cstr);
+vstring* vstring_new_len(size_t initial_cap);
 int vstring_push_char(vstring** vstr, char c);
 int vstring_push_string(vstring** vstr, char* cstr);
 int vstring_set(vstring** vstr, char* cstr);
@@ -54,6 +55,19 @@ vstr vstr_from(char* cstr) {
     }
 
     return vstr->data;
+}
+
+/**
+ * @brief allocate a new vstr with specified capacity
+ * @param initial_cap the initial capacity
+ * @returns vstr, NULL if malloc failed
+ */
+vstr vstr_new_len(size_t initial_cap) {
+    vstring* vstring = vstring_new_len(initial_cap);
+    if (vstring == NULL) {
+        return NULL;
+    }
+    return vstring->data;
 }
 
 /**
@@ -193,6 +207,27 @@ vstring* vstring_from(char* cstr) {
     memcpy(vstr->data, cstr, cap);
     vstr->hdr.len = cap;
     vstr->hdr.cap = cap + 1;
+    return vstr;
+}
+
+/**
+ * @brief allocate a vstring with a specified capacity
+ * @param initial_cap the initial capacity
+ * @returns vstring, NULL if malloc returns NULL
+ */
+vstring* vstring_new_len(size_t initial_cap) {
+    vstring* vstr;
+    size_t needed_len = sizeof(vstring) + initial_cap + 1;
+
+    vstr = vstr_malloc(needed_len);
+    if (vstr == NULL) {
+        return NULL;
+    }
+
+    memset(vstr, 0, needed_len);
+    vstr->hdr.len = 0;
+    vstr->hdr.cap = initial_cap + 1;
+
     return vstr;
 }
 
