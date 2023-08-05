@@ -2,13 +2,14 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 vstring* vstring_new();
-vstring* vstring_from(char* cstr);
+vstring* vstring_from(const char* cstr);
 vstring* vstring_new_len(size_t initial_cap);
 int vstring_push_char(vstring** vstr, char c);
-int vstring_push_string(vstring** vstr, char* cstr);
-int vstring_set(vstring** vstr, char* cstr);
+int vstring_push_string(vstring** vstr, const char* cstr);
+int vstring_set(vstring** vstr, const char* cstr);
 
 // can this be optimized depending on the allocator ?
 // the only problem is that i think this would cause ifdef hell.. to deal
@@ -46,7 +47,7 @@ vstr vstr_new() {
  * @param cstr the string to copy - must not be NULL
  * @return pointer to string, NULL if malloc failed
  */
-vstr vstr_from(char* cstr) {
+vstr vstr_from(const char* cstr) {
     vstring* vstr;
 
     vstr = vstring_from(cstr);
@@ -128,7 +129,7 @@ vstr vstr_format(const char* fmt, ...) {
  * @param cstr the string to set vstr to - must not be NULL
  * @return pointer to vstr, NULL if realloc called and failed
  */
-vstr vstr_set(vstr str, char* cstr) {
+vstr vstr_set(vstr str, const char* cstr) {
     vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
     int set_res = vstring_set(&vstr, cstr);
     if (set_res == -1) {
@@ -159,7 +160,7 @@ vstr vstr_push_char(vstr str, char c) {
  * @param cstr pointer to c string - must not be NULL
  * @return pointer to string, NULL if realloc called and failed
  */
-vstr vstr_push_string(vstr str, char* cstr) {
+vstr vstr_push_string(vstr str, const char* cstr) {
     vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
     int push_res = vstring_push_string(&vstr, cstr);
     if (push_res == -1) {
@@ -234,7 +235,7 @@ vstring* vstring_new() {
  * @param cstr string to initialize from - should not be NULL
  * @return vstring pointer, NULL if malloc returns NULL
  */
-vstring* vstring_from(char* cstr) {
+vstring* vstring_from(const char* cstr) {
     vstring* vstr;
     size_t cap = strlen(cstr);
     size_t needed_len = sizeof(vstring) + cap + 1;
@@ -297,7 +298,7 @@ int vstring_push_char(vstring** vstr, char c) {
  * @param cstr the c string to push
  * @return 0 if success, 1 if realloc is called and failed
  */
-int vstring_push_string(vstring** vstr, char* cstr) {
+int vstring_push_string(vstring** vstr, const char* cstr) {
     size_t ins, cap, cstr_len, needed;
     vstring vs;
     vs = **vstr;
@@ -321,7 +322,7 @@ int vstring_push_string(vstring** vstr, char* cstr) {
  * @param cstr the string to set
  * @return 0 on success, -1 if realloc called and failed
  */
-int vstring_set(vstring** vstr, char* cstr) {
+int vstring_set(vstring** vstr, const char* cstr) {
     size_t ins, cap, cstr_len, needed;
     vstring vs;
     vs = **vstr;
