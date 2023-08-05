@@ -116,7 +116,7 @@ vstr vstr_format(const char* fmt, ...) {
     va_end(ap);
 
     if (n < 0) {
-        free(vstr);
+        vstr_free(vstr);
         return NULL;
     }
 
