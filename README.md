@@ -67,7 +67,7 @@ specify an allocator:
 ensure that the allocating and deallocating implementations are defined before
 including the vstr header file
 
-### Limitations
+## Limitations
 
 Notice above how the user must reassign the vstr when appending to it. This is required because
 vstr might have to reallocate memory for its internal data structure to accomodate the new
