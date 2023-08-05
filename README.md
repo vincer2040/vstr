@@ -84,6 +84,13 @@ assert(vstr_cap(s1) == 33);
 assert(vstr_available(s1) == 32);
 ```
 
+create a vstr from a formatted string:
+
+```c
+vstr s = vstr_format("he was number %d", 1);
+printf("%s\n", s); // "he was number 1"
+```
+
 useful utility functions:
 
 ```c
