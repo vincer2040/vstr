@@ -42,7 +42,16 @@ create a vstr from a C string:
 ```c
 vstr s = vstr_from("vstr");
 printf("%s\n", s); // "vstr"
-vstr_free(s);
+vstr_delete(s);
+```
+
+set the vstring to a different C string
+
+```c
+vstr s = vstr_from("vstr");
+s = vstr_set(s, "a string implementation");
+printf("%s\n", s); // "a string implementation"
+vstr_delete(s);
 ```
 
 get the length of a vstr:
@@ -51,10 +60,10 @@ get the length of a vstr:
 vstr s = string_from("vstr");
 size_t len = vstr_len(s);
 printf("%lu\n", len); // "4"
-vstr_free(s);
+vstr_delete(s);
 ```
 
-specify an allocator:
+### specify an allocator:
 
 ```c
 #define vstr_alloc
