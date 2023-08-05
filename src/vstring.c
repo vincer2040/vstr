@@ -57,6 +57,19 @@ vstr vstr_from(char* cstr) {
 }
 
 /**
+ * @brief duplicate a vstr
+ * @param str the vstr to copy
+ * @returns vstr, NULL if malloc fails
+ */
+vstr vstr_dup(vstr str) {
+    vstring* vs = vstring_from(str);
+    if (vs == NULL) {
+        return NULL;
+    }
+    return vs->data;
+}
+
+/**
  * @brief set contents of a vstring
  * @param str pointer to vstring
  * @param cstr the string to set vstr to - must not be NULL
