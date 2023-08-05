@@ -228,6 +228,12 @@ int vstring_push_string(vstring** vstr, char* cstr) {
     return 0;
 }
 
+/**
+ * @brief clear the current data and set it with cstr
+ * @param vstr pointer to pointer of allocated vstring
+ * @param cstr the string to set
+ * @return 0 on success, -1 if realloc called and failed
+ */
 int vstring_set(vstring** vstr, char* cstr) {
     size_t ins, cap, cstr_len, needed;
     vstring vs;
