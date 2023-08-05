@@ -1,5 +1,6 @@
 #include "vstring.h"
 #include "stdio.h"
+#include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -81,6 +82,45 @@ vstr vstr_dup(vstr str) {
         return NULL;
     }
     return vs->data;
+}
+
+/**
+ * @brief create a vstr from a format
+ * @param fmt the format string
+ * @param ... the arguments
+ * @returns vstr, NULL if fail
+ */
+vstr vstr_format(const char* fmt, ...) {
+    int n;
+    size_t size = 0;
+    char* p = NULL;
+    va_list ap;
+    vstring* vstr;
+
+    va_start(ap, fmt);
+    n = vsnprintf(p, size, fmt, ap);
+    va_end(ap);
+
+    if (n < 0) {
+        return NULL;
+    }
+
+    size = ((size_t)n) + 1;
+    vstr = vstring_new_len(size);
+    if (vstr == NULL) {
+        return NULL;
+    }
+
+    va_start(ap, fmt);
+    n = vsnprintf(vstr->data, size, fmt, ap);
+    va_end(ap);
+
+    if (n < 0) {
+        free(vstr);
+        return NULL;
+    }
+
+    return vstr->data;
 }
 
 /**

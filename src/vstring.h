@@ -43,6 +43,7 @@ typedef struct {
 vstr vstr_new();
 vstr vstr_from(char* cstr);
 vstr vstr_dup(vstr str);
+vstr vstr_format(const char* fmt, ...);
 vstr vstr_set(vstr str, char* cstr);
 vstr vstr_push_char(vstr str, char c);
 vstr vstr_push_string(vstr str, char* cstr);
