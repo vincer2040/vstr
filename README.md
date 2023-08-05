@@ -61,7 +61,11 @@ specify an allocator:
 #define vstr_malloc <malloc implementation>
 #define vstr_realloc <realloc implementation>
 #define vstr_free <free implementation>
+#include "vstr.h"
 ```
+
+ensure that the allocating and deallocating implementations are defined before
+including the vstr header file
 
 ### Limitations
 
