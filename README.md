@@ -57,7 +57,7 @@ vstr_delete(s);
 get the length of a vstr:
 
 ```c
-vstr s = string_from("vstr");
+vstr s = vstr_from("vstr");
 size_t len = vstr_len(s);
 printf("%lu\n", len); // "4"
 vstr_delete(s);
