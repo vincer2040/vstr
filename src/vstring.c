@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-vstring* vstring_new();
+vstring* vstring_new(void);
 vstring* vstring_from(const char* cstr);
 vstring* vstring_new_len(size_t initial_cap);
 int vstring_push_char(vstring** vstring_obj, char c);
@@ -34,7 +34,7 @@ int vstring_set(vstring** vstring_obj, const char* cstr);
  * @brief allocate a new vstr
  * @return pointer to string, NULL if malloc failed
  */
-vstr vstr_new() {
+vstr vstr_new(void) {
     vstring* vstring_obj;
 
     vstring_obj = vstring_new();
@@ -217,7 +217,7 @@ void vstr_delete(vstr vstr) {
  * @brief allocate a vstring
  * @return vstring pointer, NULL if malloc returns NULL
  */
-vstring* vstring_new() {
+vstring* vstring_new(void) {
     vstring* vstring_obj;
     size_t needed_len = sizeof(vstring) + VSTRING_INITIAL_CAP;
 
