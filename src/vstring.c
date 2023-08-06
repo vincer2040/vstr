@@ -1,8 +1,8 @@
 #include "vstring.h"
 #include <stdarg.h>
 #include <stdint.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 vstring* vstring_new();
 vstring* vstring_from(const char* cstr);
@@ -19,10 +19,13 @@ int vstring_set(vstring** vstr, const char* cstr);
 
 #define realloc_vstr(vstr, ins, cap)                                           \
     {                                                                          \
-        *vstr = vstr_realloc(*vstr, sizeof(vstring) + cap);                    \
-        if (*vstr == NULL) {                                                   \
+        vstring* tmp;                                                          \
+        tmp = vstr_realloc(*vstr, sizeof(vstring) + cap);                      \
+        if (tmp == NULL) {                                                     \
+            free(*vstr);                                                       \
             return -1;                                                         \
         }                                                                      \
+        *vstr = tmp;                                                           \
         memset((*vstr)->data + ins, 0, cap - ins);                             \
         (*vstr)->hdr.cap = cap;                                                \
     }
