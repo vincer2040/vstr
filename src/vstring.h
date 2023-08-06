@@ -42,14 +42,14 @@ typedef struct {
 
 vstr vstr_new();
 vstr vstr_from(const char* cstr);
-vstr vstr_dup(vstr str);
+vstr vstr_dup(vstr vstr);
 vstr vstr_format(const char* fmt, ...);
-vstr vstr_set(vstr str, const char* cstr);
-vstr vstr_push_char(vstr str, char c);
-vstr vstr_push_string(vstr str, const char* cstr);
-size_t vstr_len(vstr str);
-size_t vstr_cap(vstr str);
-size_t vstr_available(vstr str);
-void vstr_delete(vstr str);
+vstr vstr_set(vstr vstr, const char* cstr);
+vstr vstr_push_char(vstr vstr, char c);
+vstr vstr_push_string(vstr vstr, const char* cstr);
+size_t vstr_len(vstr vstr);
+size_t vstr_cap(vstr vstr);
+size_t vstr_available(vstr vstr);
+void vstr_delete(vstr vstr);
 
 #endif /* __VSTRING_H__ */

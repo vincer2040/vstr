@@ -7,9 +7,9 @@
 vstring* vstring_new();
 vstring* vstring_from(const char* cstr);
 vstring* vstring_new_len(size_t initial_cap);
-int vstring_push_char(vstring** vstr, char c);
-int vstring_push_string(vstring** vstr, const char* cstr);
-int vstring_set(vstring** vstr, const char* cstr);
+int vstring_push_char(vstring** vstring_obj, char c);
+int vstring_push_string(vstring** vstring_obj, const char* cstr);
+int vstring_set(vstring** vstring_obj, const char* cstr);
 
 // can this be optimized depending on the allocator ?
 // the only problem is that i think this would cause ifdef hell.. to deal
@@ -17,17 +17,17 @@ int vstring_set(vstring** vstr, const char* cstr);
 #define VSTRING_INITIAL_CAP 32
 #define VSTRING_OFFSET sizeof(vstring_hdr)
 
-#define realloc_vstr(vstr, ins, cap)                                           \
+#define realloc_vstr(vstring_obj, ins, cap)                                    \
     {                                                                          \
         vstring* tmp;                                                          \
-        tmp = vstr_realloc(*vstr, sizeof(vstring) + cap);                      \
+        tmp = vstr_realloc(*vstring_obj, sizeof(vstring) + cap);               \
         if (tmp == NULL) {                                                     \
-            free(*vstr);                                                       \
+            free(*vstring_obj);                                                \
             return -1;                                                         \
         }                                                                      \
-        *vstr = tmp;                                                           \
-        memset((*vstr)->data + ins, 0, cap - ins);                             \
-        (*vstr)->hdr.cap = cap;                                                \
+        *vstring_obj = tmp;                                                    \
+        memset((*vstring_obj)->data + ins, 0, cap - ins);                      \
+        (*vstring_obj)->hdr.cap = cap;                                         \
     }
 
 /**
@@ -35,14 +35,14 @@ int vstring_set(vstring** vstr, const char* cstr);
  * @return pointer to string, NULL if malloc failed
  */
 vstr vstr_new() {
-    vstring* vstr;
+    vstring* vstring_obj;
 
-    vstr = vstring_new();
-    if (vstr == NULL) {
+    vstring_obj = vstring_new();
+    if (vstring_obj == NULL) {
         return NULL;
     }
 
-    return vstr->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -51,14 +51,14 @@ vstr vstr_new() {
  * @return pointer to string, NULL if malloc failed
  */
 vstr vstr_from(const char* cstr) {
-    vstring* vstr;
+    vstring* vstring_obj;
 
-    vstr = vstring_from(cstr);
-    if (vstr == NULL) {
+    vstring_obj = vstring_from(cstr);
+    if (vstring_obj == NULL) {
         return NULL;
     }
 
-    return vstr->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -67,11 +67,11 @@ vstr vstr_from(const char* cstr) {
  * @returns vstr, NULL if malloc failed
  */
 vstr vstr_new_len(size_t initial_cap) {
-    vstring* vstring = vstring_new_len(initial_cap);
-    if (vstring == NULL) {
+    vstring* vstring_obj = vstring_new_len(initial_cap);
+    if (vstring_obj == NULL) {
         return NULL;
     }
-    return vstring->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -79,12 +79,12 @@ vstr vstr_new_len(size_t initial_cap) {
  * @param str the vstr to copy
  * @returns vstr, NULL if malloc fails
  */
-vstr vstr_dup(vstr str) {
-    vstring* vs = vstring_from(str);
-    if (vs == NULL) {
+vstr vstr_dup(vstr vstr) {
+    vstring* vstring_obj = vstring_from(vstr);
+    if (vstring_obj == NULL) {
         return NULL;
     }
-    return vs->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -98,7 +98,7 @@ vstr vstr_format(const char* fmt, ...) {
     size_t size = 0;
     char* p = NULL;
     va_list ap;
-    vstring* vstr;
+    vstring* vstring_obj;
 
     va_start(ap, fmt);
     n = vsnprintf(p, size, fmt, ap);
@@ -109,21 +109,21 @@ vstr vstr_format(const char* fmt, ...) {
     }
 
     size = ((size_t)n) + 1;
-    vstr = vstring_new_len(size);
-    if (vstr == NULL) {
+    vstring_obj = vstring_new_len(size);
+    if (vstring_obj == NULL) {
         return NULL;
     }
 
     va_start(ap, fmt);
-    n = vsnprintf(vstr->data, size, fmt, ap);
+    n = vsnprintf(vstring_obj->data, size, fmt, ap);
     va_end(ap);
 
     if (n < 0) {
-        vstr_free(vstr);
+        vstr_free(vstring_obj);
         return NULL;
     }
 
-    return vstr->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -132,14 +132,14 @@ vstr vstr_format(const char* fmt, ...) {
  * @param cstr the string to set vstr to - must not be NULL
  * @return pointer to vstr, NULL if realloc called and failed
  */
-vstr vstr_set(vstr str, const char* cstr) {
-    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
-    int set_res = vstring_set(&vstr, cstr);
+vstr vstr_set(vstr vstr, const char* cstr) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
+    int set_res = vstring_set(&vstring_obj, cstr);
     if (set_res == -1) {
         return NULL;
     }
 
-    return vstr->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -148,13 +148,13 @@ vstr vstr_set(vstr str, const char* cstr) {
  * @param c the char to push
  * @return pointer to string, NULL if realloc called and failed
  */
-vstr vstr_push_char(vstr str, char c) {
-    vstring* ptr = ((vstring*)(str - VSTRING_OFFSET));
-    int push_res = vstring_push_char(&ptr, c);
+vstr vstr_push_char(vstr vstr, char c) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
+    int push_res = vstring_push_char(&vstring_obj, c);
     if (push_res == -1) {
         return NULL;
     }
-    return ptr->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -163,13 +163,13 @@ vstr vstr_push_char(vstr str, char c) {
  * @param cstr pointer to c string - must not be NULL
  * @return pointer to string, NULL if realloc called and failed
  */
-vstr vstr_push_string(vstr str, const char* cstr) {
-    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
-    int push_res = vstring_push_string(&vstr, cstr);
+vstr vstr_push_string(vstr vstr, const char* cstr) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
+    int push_res = vstring_push_string(&vstring_obj, cstr);
     if (push_res == -1) {
         return NULL;
     }
-    return vstr->data;
+    return vstring_obj->data;
 }
 
 /**
@@ -177,9 +177,9 @@ vstr vstr_push_string(vstr str, const char* cstr) {
  * @param str pointer to vstr
  * @return length of the string
  */
-size_t vstr_len(vstr str) {
-    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
-    return vstr->hdr.len;
+size_t vstr_len(vstr vstr) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
+    return vstring_obj->hdr.len;
 }
 
 /**
@@ -187,9 +187,9 @@ size_t vstr_len(vstr str) {
  * @param str pointer to vstr
  * @return capacity of the vstr
  */
-size_t vstr_cap(vstr str) {
-    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
-    return vstr->hdr.cap - 1; // -1 to account for null terminator
+size_t vstr_cap(vstr vstr) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
+    return vstring_obj->hdr.cap - 1; // -1 to account for null terminator
 }
 
 /**
@@ -197,19 +197,19 @@ size_t vstr_cap(vstr str) {
  * @param str pointer to vstr
  * @return available space in vstr
  */
-size_t vstr_available(vstr str) {
-    vstring* vstr = ((vstring*)(str - VSTRING_OFFSET));
+size_t vstr_available(vstr vstr) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
     // cap is always >= len + 1
     // we accomodate for null terminator with - 1
-    return vstr->hdr.cap - vstr->hdr.len - 1;
+    return vstring_obj->hdr.cap - vstring_obj->hdr.len - 1;
 }
 
 /**
  * @brief free vstring
  * @param pointer to vstr to free
  */
-void vstr_delete(vstr str) {
-    void* ptr = str - VSTRING_OFFSET;
+void vstr_delete(vstr vstr) {
+    void* ptr = vstr - VSTRING_OFFSET;
     free(ptr);
 }
 
@@ -218,19 +218,19 @@ void vstr_delete(vstr str) {
  * @return vstring pointer, NULL if malloc returns NULL
  */
 vstring* vstring_new() {
-    vstring* vstr;
+    vstring* vstring_obj;
     size_t needed_len = sizeof(vstring) + VSTRING_INITIAL_CAP;
 
-    vstr = vstr_malloc(needed_len);
-    if (vstr == NULL) {
+    vstring_obj = vstr_malloc(needed_len);
+    if (vstring_obj == NULL) {
         return NULL;
     }
 
-    memset(vstr, 0, needed_len);
-    vstr->hdr.len = 0;
-    vstr->hdr.cap = VSTRING_INITIAL_CAP;
+    memset(vstring_obj, 0, needed_len);
+    vstring_obj->hdr.len = 0;
+    vstring_obj->hdr.cap = VSTRING_INITIAL_CAP;
 
-    return vstr;
+    return vstring_obj;
 }
 
 /**
@@ -239,18 +239,18 @@ vstring* vstring_new() {
  * @return vstring pointer, NULL if malloc returns NULL
  */
 vstring* vstring_from(const char* cstr) {
-    vstring* vstr;
+    vstring* vstring_obj;
     size_t cap = strlen(cstr);
     size_t needed_len = sizeof(vstring) + cap + 1;
-    vstr = vstr_malloc(needed_len);
-    if (vstr == NULL) {
+    vstring_obj = vstr_malloc(needed_len);
+    if (vstring_obj == NULL) {
         return NULL;
     }
-    memset(vstr, 0, needed_len);
-    memcpy(vstr->data, cstr, cap);
-    vstr->hdr.len = cap;
-    vstr->hdr.cap = cap + 1;
-    return vstr;
+    memset(vstring_obj, 0, needed_len);
+    memcpy(vstring_obj->data, cstr, cap);
+    vstring_obj->hdr.len = cap;
+    vstring_obj->hdr.cap = cap + 1;
+    return vstring_obj;
 }
 
 /**
@@ -259,19 +259,19 @@ vstring* vstring_from(const char* cstr) {
  * @returns vstring, NULL if malloc returns NULL
  */
 vstring* vstring_new_len(size_t initial_cap) {
-    vstring* vstr;
+    vstring* vstring_obj;
     size_t needed_len = sizeof(vstring) + initial_cap + 1;
 
-    vstr = vstr_malloc(needed_len);
-    if (vstr == NULL) {
+    vstring_obj = vstr_malloc(needed_len);
+    if (vstring_obj == NULL) {
         return NULL;
     }
 
-    memset(vstr, 0, needed_len);
-    vstr->hdr.len = 0;
-    vstr->hdr.cap = initial_cap + 1;
+    memset(vstring_obj, 0, needed_len);
+    vstring_obj->hdr.len = 0;
+    vstring_obj->hdr.cap = initial_cap + 1;
 
-    return vstr;
+    return vstring_obj;
 }
 
 /**
@@ -280,18 +280,18 @@ vstring* vstring_new_len(size_t initial_cap) {
  * @param c the char to push
  * @return 0 if success, 1 if realloc is called and failed
  */
-int vstring_push_char(vstring** vstr, char c) {
+int vstring_push_char(vstring** vstring_obj, char c) {
     size_t ins, cap;
     vstring vs;
-    vs = **vstr;
+    vs = **vstring_obj;
     cap = vs.hdr.cap;
     ins = vs.hdr.len;
     if (ins == (cap - 1)) {
         cap <<= 1; // multiply by two
-        realloc_vstr(vstr, ins, cap);
+        realloc_vstr(vstring_obj, ins, cap);
     }
-    (*vstr)->data[ins] = c;
-    (*vstr)->hdr.len++;
+    (*vstring_obj)->data[ins] = c;
+    (*vstring_obj)->hdr.len++;
     return 0;
 }
 
@@ -301,10 +301,10 @@ int vstring_push_char(vstring** vstr, char c) {
  * @param cstr the c string to push
  * @return 0 if success, 1 if realloc is called and failed
  */
-int vstring_push_string(vstring** vstr, const char* cstr) {
+int vstring_push_string(vstring** vstring_obj, const char* cstr) {
     size_t ins, cap, cstr_len, needed;
     vstring vs;
-    vs = **vstr;
+    vs = **vstring_obj;
     ins = vs.hdr.len;
     cap = vs.hdr.cap;
     cstr_len = strlen(cstr);
@@ -312,10 +312,10 @@ int vstring_push_string(vstring** vstr, const char* cstr) {
     if (needed > (cap - 1)) {
         cap <<= 1;
         cap += needed;
-        realloc_vstr(vstr, ins, cap);
+        realloc_vstr(vstring_obj, ins, cap);
     }
-    memcpy((*vstr)->data + ins, cstr, cstr_len);
-    (*vstr)->hdr.len += cstr_len;
+    memcpy((*vstring_obj)->data + ins, cstr, cstr_len);
+    (*vstring_obj)->hdr.len += cstr_len;
     return 0;
 }
 
@@ -325,10 +325,10 @@ int vstring_push_string(vstring** vstr, const char* cstr) {
  * @param cstr the string to set
  * @return 0 on success, -1 if realloc called and failed
  */
-int vstring_set(vstring** vstr, const char* cstr) {
+int vstring_set(vstring** vstring_obj, const char* cstr) {
     size_t ins, cap, cstr_len, needed;
     vstring vs;
-    vs = **vstr;
+    vs = **vstring_obj;
     ins = vs.hdr.len;
     cap = vs.hdr.cap;
     cstr_len = strlen(cstr);
@@ -336,11 +336,11 @@ int vstring_set(vstring** vstr, const char* cstr) {
     if (needed > (cap - 1)) {
         cap <<= 1;
         cap += needed;
-        realloc_vstr(vstr, ins, cap);
+        realloc_vstr(vstring_obj, ins, cap);
     }
-    memset((*vstr)->data, 0, cap);
-    memcpy((*vstr)->data, cstr, cstr_len);
-    (*vstr)->hdr.len = cstr_len;
+    memset((*vstring_obj)->data, 0, cap);
+    memcpy((*vstring_obj)->data, cstr, cstr_len);
+    (*vstring_obj)->hdr.len = cstr_len;
     return 0;
 }
 
@@ -349,17 +349,17 @@ int vstring_set(vstring** vstr, const char* cstr) {
  * @param vstr the allocated vstring
  * @return the length of the string
  */
-size_t vstring_len(vstring* vstr) { return vstr->hdr.len; }
+size_t vstring_len(vstring* vstring_obj) { return vstring_obj->hdr.len; }
 
 /**
  * @brief get the c string
  * @param vstr the allocated vstring
  * @return the c string
  */
-char* vstring_get(vstring* vstr) { return vstr->data; }
+char* vstring_get(vstring* vstring_obj) { return vstring_obj->data; }
 
 /**
  * @brief free the vstring
  * @param vstr the vstring to free
  */
-void vstring_free(vstring* vstr) { vstr_free(vstr); }
+void vstring_free(vstring* vstring_obj) { vstr_free(vstring_obj); }
