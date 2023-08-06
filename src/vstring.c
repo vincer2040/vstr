@@ -278,7 +278,7 @@ vstring* vstring_new_len(size_t initial_cap) {
  * @brief add a char to the end of the string
  * @param vstr a pointer to pointer of allocated vstring
  * @param c the char to push
- * @return 0 if success, 1 if realloc is called and failed
+ * @return 0 if success, -1 if realloc is called and failed
  */
 int vstring_push_char(vstring** vstring_obj, char c) {
     size_t ins, cap;
@@ -299,7 +299,7 @@ int vstring_push_char(vstring** vstring_obj, char c) {
  * @brief concatinate a c string to the end of the string
  * @param vstr a pointer to pointer of allocated vstring
  * @param cstr the c string to push
- * @return 0 if success, 1 if realloc is called and failed
+ * @return 0 if success, -1 if realloc is called and failed
  */
 int vstring_push_string(vstring** vstring_obj, const char* cstr) {
     size_t ins, cap, cstr_len, needed;
