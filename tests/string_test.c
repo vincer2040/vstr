@@ -49,6 +49,12 @@ START_TEST(test_vstr_format) {
 }
 END_TEST
 
+START_TEST(test_cap_overflow_len) {
+    vstr s = vstr_new_len(18446744073709551613UL);
+    ck_assert_ptr_null(s);
+}
+END_TEST
+
 Suite* ht_suite() {
     Suite* s;
     TCase* tc_core;
@@ -58,6 +64,7 @@ Suite* ht_suite() {
     tcase_add_test(tc_core, test_vstr_push_str);
     tcase_add_test(tc_core, test_vstr_set);
     tcase_add_test(tc_core, test_vstr_format);
+    tcase_add_test(tc_core, test_cap_overflow_len);
     suite_add_tcase(s, tc_core);
     return s;
 }

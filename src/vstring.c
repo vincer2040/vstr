@@ -239,6 +239,7 @@ vstring* vstring_from(const char* cstr) {
     vstring* vstring_obj;
     size_t cap = strlen(cstr);
     size_t needed_len = sizeof(vstring) + cap + 1;
+
     vstring_obj = vstr_malloc(needed_len);
     if (vstring_obj == NULL) {
         return NULL;
@@ -257,7 +258,19 @@ vstring* vstring_from(const char* cstr) {
  */
 vstring* vstring_new_len(size_t initial_cap) {
     vstring* vstring_obj;
+    size_t tmp_inital_cap = initial_cap;
     size_t needed_len = sizeof(vstring) + initial_cap + 1;
+
+    if (needed_len < tmp_inital_cap) {
+        // we have overflowed
+        fprintf(stderr, "vstr failed to allocate in vstr_new_len, capacity is too large\n");
+        return NULL;
+    }
+
+    if (needed_len > SIZE_MAX) {
+        fprintf(stderr, "vstr cannot allocate a string larger than size max (vstr_new_len)\n");
+        return NULL;
+    }
 
     vstring_obj = vstr_malloc(needed_len);
     if (vstring_obj == NULL) {
@@ -287,7 +300,7 @@ int vstring_push_char(vstring** vstring_obj, char c) {
         size_t tmp_cap = cap;
         cap <<= 1; // multiply by two
         cap += ins;
-        if (cap > tmp_cap) {
+        if ((cap < tmp_cap) || (cap > SIZE_MAX)) {
             // we have overflowed
             fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
             vstr_free(*vstring_obj);
@@ -318,7 +331,7 @@ int vstring_push_string(vstring** vstring_obj, const char* cstr) {
         size_t tmp_cap = cap;
         cap <<= 1;
         cap += needed;
-        if (cap < tmp_cap) {
+        if ((cap < tmp_cap) || (cap > SIZE_MAX)) {
             // we have overflowed
             fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
             vstr_free(*vstring_obj);
@@ -349,7 +362,7 @@ int vstring_set(vstring** vstring_obj, const char* cstr) {
         size_t tmp_cap = cap;
         cap <<= 1;
         cap += needed;
-        if (cap < tmp_cap) {
+        if ((cap < tmp_cap) || (cap > SIZE_MAX)) {
             // we have overflowed
             fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
             vstr_free(*vstring_obj);

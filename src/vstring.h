@@ -42,6 +42,7 @@ typedef struct {
 
 vstr vstr_new(void);
 vstr vstr_from(const char* cstr);
+vstr vstr_new_len(size_t initial_cap);
 vstr vstr_dup(vstr vstr);
 vstr vstr_format(const char* fmt, ...);
 vstr vstr_set(vstr vstr, const char* cstr);
