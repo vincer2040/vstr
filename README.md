@@ -2,7 +2,7 @@
 
 A safe string implementation in pure C. Originally created for
 an interpreter following the incredible book "Writing an Interpreter In Go"
-by Thorston Bell (you can find the book [here](https://interpreterbook.com/), highly recommend)
+by Thorston Ball (you can find the book [here](https://interpreterbook.com/), highly recommend)
 
 ## Getting started
 
