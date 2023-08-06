@@ -11,9 +11,6 @@ int vstring_push_char(vstring** vstring_obj, char c);
 int vstring_push_string(vstring** vstring_obj, const char* cstr);
 int vstring_set(vstring** vstring_obj, const char* cstr);
 
-// can this be optimized depending on the allocator ?
-// the only problem is that i think this would cause ifdef hell.. to deal
-// with but 32 bit architectures and checking what the allocator is.
 #define VSTRING_INITIAL_CAP 32
 #define VSTRING_OFFSET sizeof(vstring_hdr)
 
@@ -286,8 +283,16 @@ int vstring_push_char(vstring** vstring_obj, char c) {
     vs = **vstring_obj;
     cap = vs.hdr.cap;
     ins = vs.hdr.len;
-    if (ins == (cap - 1)) {
+    if (ins >= (cap - 1)) {
+        size_t tmp_cap = cap;
         cap <<= 1; // multiply by two
+        cap += ins;
+        if (cap > tmp_cap) {
+            // we have overflowed
+            fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
+            vstr_free(*vstring_obj);
+            return -1;
+        }
         realloc_vstr(vstring_obj, ins, cap);
     }
     (*vstring_obj)->data[ins] = c;
@@ -309,9 +314,16 @@ int vstring_push_string(vstring** vstring_obj, const char* cstr) {
     cap = vs.hdr.cap;
     cstr_len = strlen(cstr);
     needed = ins + cstr_len;
-    if (needed > (cap - 1)) {
+    if (needed >= (cap - 1)) {
+        size_t tmp_cap = cap;
         cap <<= 1;
         cap += needed;
+        if (cap < tmp_cap) {
+            // we have overflowed
+            fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
+            vstr_free(*vstring_obj);
+            return -1;
+        }
         realloc_vstr(vstring_obj, ins, cap);
     }
     memcpy((*vstring_obj)->data + ins, cstr, cstr_len);
@@ -333,9 +345,16 @@ int vstring_set(vstring** vstring_obj, const char* cstr) {
     cap = vs.hdr.cap;
     cstr_len = strlen(cstr);
     needed = ins + cstr_len;
-    if (needed > (cap - 1)) {
+    if (needed >= (cap - 1)) {
+        size_t tmp_cap = cap;
         cap <<= 1;
         cap += needed;
+        if (cap < tmp_cap) {
+            // we have overflowed
+            fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
+            vstr_free(*vstring_obj);
+            return -1;
+        }
         realloc_vstr(vstring_obj, ins, cap);
     }
     memset((*vstring_obj)->data, 0, cap);
