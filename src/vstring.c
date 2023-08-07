@@ -12,7 +12,7 @@ int vstring_push_string(vstring** vstring_obj, const char* cstr);
 int vstring_set(vstring** vstring_obj, const char* cstr);
 
 #define VSTRING_INITIAL_CAP 32
-#define VSTRING_OFFSET sizeof(vstring_hdr)
+#define VSTRING_OFFSET (intptr_t)(&((vstring*)NULL)->data)
 
 #define realloc_vstr(vstring_obj, ins, cap)                                    \
     {                                                                          \
