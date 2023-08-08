@@ -10,6 +10,7 @@ vstring* vstring_new_len(size_t initial_cap);
 int vstring_push_char(vstring** vstring_obj, char c);
 int vstring_push_string(vstring** vstring_obj, const char* cstr);
 int vstring_set(vstring** vstring_obj, const char* cstr);
+int vstring_push_string_len(vstring** vstring_obj, const char* cstr, size_t cstr_len);
 
 #define VSTRING_INITIAL_CAP 32
 #define VSTRING_OFFSET (intptr_t)(&((vstring*)NULL)->data)
@@ -163,6 +164,22 @@ vstr vstr_push_char(vstr vstr, char c) {
 vstr vstr_push_string(vstr vstr, const char* cstr) {
     vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
     int push_res = vstring_push_string(&vstring_obj, cstr);
+    if (push_res == -1) {
+        return NULL;
+    }
+    return vstring_obj->data;
+}
+
+/**
+ * @brief append a string to the end of str
+ * @param str the allocated vstr
+ * @param cstr pointer to c string - must not be NULL
+ * @param cstr_len the length of cstr ot push
+ * @return pointer to string, NULL if realloc called and failed
+ */
+vstr vstr_push_string_len(vstr vstr, const char* cstr, size_t cstr_len) {
+    vstring* vstring_obj = ((vstring*)(vstr - VSTRING_OFFSET));
+    int push_res = vstring_push_string_len(&vstring_obj, cstr, cstr_len);
     if (push_res == -1) {
         return NULL;
     }
@@ -326,6 +343,37 @@ int vstring_push_string(vstring** vstring_obj, const char* cstr) {
     ins = vs.hdr.len;
     cap = vs.hdr.cap;
     cstr_len = strlen(cstr);
+    needed = ins + cstr_len;
+    if (needed >= (cap - 1)) {
+        size_t tmp_cap = cap;
+        cap <<= 1;
+        cap += needed;
+        if ((cap < tmp_cap) || (cap > SIZE_MAX)) {
+            // we have overflowed
+            fprintf(stderr, "vstr failed to allocate memory, capacity is too large\n");
+            vstr_free(*vstring_obj);
+            return -1;
+        }
+        realloc_vstr(vstring_obj, ins, cap);
+    }
+    memcpy((*vstring_obj)->data + ins, cstr, cstr_len);
+    (*vstring_obj)->hdr.len += cstr_len;
+    return 0;
+}
+
+/**
+ * @brief concatinate a c string to the end of the string
+ * @param vstr a pointer to pointer of allocated vstring
+ * @param cstr the c string to push
+ * @param cstr_len the length to push
+ * @return 0 if success, -1 if realloc is called and failed
+ */
+int vstring_push_string_len(vstring** vstring_obj, const char* cstr, size_t cstr_len) {
+    size_t ins, cap, needed;
+    vstring vs;
+    vs = **vstring_obj;
+    ins = vs.hdr.len;
+    cap = vs.hdr.cap;
     needed = ins + cstr_len;
     if (needed >= (cap - 1)) {
         size_t tmp_cap = cap;

@@ -55,6 +55,14 @@ START_TEST(test_cap_overflow_len) {
 }
 END_TEST
 
+START_TEST(test_vstr_push_str_len) {
+    vstr s = vstr_new();
+
+    s = vstr_push_string_len(s, "vincent", 5);
+    ck_assert_str_eq(s, "vince");
+}
+END_TEST
+
 Suite* ht_suite() {
     Suite* s;
     TCase* tc_core;
@@ -65,6 +73,7 @@ Suite* ht_suite() {
     tcase_add_test(tc_core, test_vstr_set);
     tcase_add_test(tc_core, test_vstr_format);
     tcase_add_test(tc_core, test_cap_overflow_len);
+    tcase_add_test(tc_core, test_vstr_push_str_len);
     suite_add_tcase(s, tc_core);
     return s;
 }

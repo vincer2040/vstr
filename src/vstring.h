@@ -48,6 +48,7 @@ vstr vstr_format(const char* fmt, ...);
 vstr vstr_set(vstr vstr, const char* cstr);
 vstr vstr_push_char(vstr vstr, char c);
 vstr vstr_push_string(vstr vstr, const char* cstr);
+vstr vstr_push_string_len(vstr vstr, const char* cstr, size_t cstr_len);
 size_t vstr_len(vstr vstr);
 size_t vstr_cap(vstr vstr);
 size_t vstr_available(vstr vstr);
