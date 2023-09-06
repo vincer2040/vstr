@@ -127,7 +127,7 @@ if you want to test the library, [libcheck](https://github.com/libcheck/check) i
 1. clone this repo
 
 ```console
-git clone git@github.com:boreddad/vstr.git && cd vstr
+git clone git@github.com:vincer2040/vstr.git && cd vstr
 ```
 
 2. build the library
